@@ -32,24 +32,33 @@ use chobie\Jira\Api\UnauthorizedException;
 
 class CurlClient implements ClientInterface
 {
-    /**
-     * create a traditional php client
-     */
-    public function __construct()
+
+	protected $curlOptions = array();
+
+	/**
+	 * create a traditional php client
+	 * @param array $curlOptions
+	 */
+    public function __construct($curlOptions = array())
     {
+		$this->curlOptions = $curlOptions;
     }
 
-    /**
-     * send request to the api server
-     *
-     * @param $method
-     * @param $url
-     * @param array $data
-     * @param $endpoint
-     * @param $credential
-     * @return array|string
-     * @throws Exception
-     */
+	/**
+	 * send request to the api server
+	 *
+	 * @param $method
+	 * @param $url
+	 * @param array $data
+	 * @param $endpoint
+	 * @param AuthenticationInterface $credential
+	 * @param bool $isFile
+	 * @param bool $debug
+	 * @throws Exception
+	 * @throws UnauthorizedException
+	 * @throws \Exception
+	 * @return array|string
+	 */
     public function sendRequest($method, $url, $data = array(), $endpoint, AuthenticationInterface $credential, $isFile = false, $debug = false)
     {
         if (!($credential instanceof Basic)) {
@@ -89,6 +98,10 @@ class CurlClient implements ClientInterface
             }
         }
 
+		if (!empty($this->curlOptions)) {
+			curl_setopt_array($curl, $this->curlOptions);
+		}
+
         $data = curl_exec($curl);
 
         $errorNumber = curl_errno($curl);
@@ -112,6 +125,5 @@ class CurlClient implements ClientInterface
 
         return $data;
     }
-
 
 }

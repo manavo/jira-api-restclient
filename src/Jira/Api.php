@@ -574,4 +574,9 @@ class Api
         }
         return $result;
     }
+
+	public function setClient(CurlClient $client) {
+		$this->client = $client;
+	}
+
 }
